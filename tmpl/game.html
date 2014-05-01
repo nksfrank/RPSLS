@@ -1,0 +1,69 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Rock Paper Scissors Lizard Spock - Written in Golang</title>
+	<link rel="stylesheet" type="text/css" href="/css/style.css" />
+</head>
+
+<body>
+<div class="container">
+	<div class="logo">
+		<h1><a href="http://localhost:8080/">Rock Paper Scissors Lizard Spock - Written in Golang</a></h1>
+	</div>
+	<div class="content">
+		<h2>Make your choice</h2>
+		<form action="/result/{{.GameId}}" action="POST">
+			<div><input type="submit" name="choice" value="rock">
+			<input type="submit" name="choice" value="paper">
+			<input type="submit" name="choice" value="scissors">
+			<input type="submit" name="choice" value="lizard">
+			<input type="submit" name="choice" value="spock"></div>
+		</form>
+		<div>
+			<h2>{{.LastGame}}</h2>
+		</div>
+		<h2>Game Stats</h2>
+		<div style="display: inline-block;">
+			<h3>Game ID</h3>
+			<p>{{.GameId}}</p>
+		</div>
+		<div style="display: inline-block;">
+			<h3>Games Played</h3>
+			<p>{{.Games}}</p>
+		</div>
+		<div style="display: inline-block;">
+			<h3>Player Score</h3>
+			<p>{{.PlayerWins}}</p>
+		</div>
+		<div style="display: inline-block;">
+			<h3>Computer Score</h3>
+			<p>{{.ComputerWins}}</p>
+		</div>
+		<div style="display: inline-block;">
+			<h3>Ties</h3>
+			<p>{{.Ties}}</p>
+		</div>
+		<table class="table">
+					<tr>
+						<th>Game ID</th>
+						<td id="comment">{{.GameId}}</td>
+					</tr>
+					<tr>
+						<th>Games Played</th>
+						<td id="comment">{{.Games}}</td>
+					</tr>
+					<tr>
+						<th>Player Score</th>
+						<td id="comment">{{.PlayerWins}}</td>
+					</tr>
+					<tr>
+						<th>Computer Score</th>
+						<td id="comment">{{.ComputerWins}}</td>
+					</tr>
+					<tr>
+						<th>Ties</th>
+						<td id="comment">{{.Ties}}</td>
+					</tr>
+				</table>
+	</div>
+</div>
