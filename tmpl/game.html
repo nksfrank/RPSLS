@@ -2,47 +2,29 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>Rock Paper Scissors Lizard Spock - Written in Golang</title>
-	<link rel="stylesheet" type="text/css" href="/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="/rpsls/css/style.css" />
 </head>
 
 <body>
 <div class="container">
 	<div class="logo">
-		<h1><a href="http://localhost:8080/">Rock Paper Scissors Lizard Spock - Written in Golang</a></h1>
+		<h1><a href="http://go.nikz.se/rpsls/">Rock Paper Scissors Lizard Spock - Written in Golang</a></h1>
 	</div>
 	<div class="content">
 		<h2>Make your choice</h2>
-		<form action="/result/{{.GameId}}" action="POST">
-			<div><input type="submit" name="choice" value="rock">
-			<input type="submit" name="choice" value="paper">
-			<input type="submit" name="choice" value="scissors">
-			<input type="submit" name="choice" value="lizard">
-			<input type="submit" name="choice" value="spock"></div>
+		<div class="box">
+		<form action="/rpsls/result/{{.GameId}}" action="POST">
+			<div><input type="submit" class="choice" name="choice" value="rock">
+			<input type="submit" class="choice" name="choice" value="paper">
+			<input type="submit" class="choice" name="choice" value="scissors">
+			<input type="submit" class="choice" name="choice" value="lizard">
+			<input type="submit" class="choice" name="choice" value="spock"></div>
 		</form>
-		<div>
+		</div>
+		<div class="result">
 			<h2>{{.LastGame}}</h2>
 		</div>
 		<h2>Game Stats</h2>
-		<div style="display: inline-block;">
-			<h3>Game ID</h3>
-			<p>{{.GameId}}</p>
-		</div>
-		<div style="display: inline-block;">
-			<h3>Games Played</h3>
-			<p>{{.Games}}</p>
-		</div>
-		<div style="display: inline-block;">
-			<h3>Player Score</h3>
-			<p>{{.PlayerWins}}</p>
-		</div>
-		<div style="display: inline-block;">
-			<h3>Computer Score</h3>
-			<p>{{.ComputerWins}}</p>
-		</div>
-		<div style="display: inline-block;">
-			<h3>Ties</h3>
-			<p>{{.Ties}}</p>
-		</div>
 		<table class="table">
 					<tr>
 						<th>Game ID</th>
@@ -50,19 +32,24 @@
 					</tr>
 					<tr>
 						<th>Games Played</th>
-						<td id="comment">{{.Games}}</td>
+						<td class="comment">{{.Games}}</td>
 					</tr>
 					<tr>
 						<th>Player Score</th>
-						<td id="comment">{{.PlayerWins}}</td>
+						<td class="comment">{{.PlayerWins}}</td>
+						<td class="stat"><div class="bar">
+						<div class="p" style="display: inline-block; width: {{.PlayerPercent}}%;">{{.PlayerPercent}}</div>
+						<div class="c" style="display: inline-block; width: {{.ComputerPercent}}%;">{{.ComputerPercent}}</div>
+						<div class="t" style="display: inline-block; width: {{.TiesPercent}}%;">{{.TiesPercent}}</div>
+						</div></td>
 					</tr>
 					<tr>
 						<th>Computer Score</th>
-						<td id="comment">{{.ComputerWins}}</td>
+						<td class="comment">{{.ComputerWins}}</td>
 					</tr>
 					<tr>
 						<th>Ties</th>
-						<td id="comment">{{.Ties}}</td>
+						<td class="comment">{{.Ties}}</td>
 					</tr>
 				</table>
 	</div>

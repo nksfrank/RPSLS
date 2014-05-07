@@ -1,7 +1,6 @@
 @charset "utf-8";
 
 body, html {
-	height: 100%;
 	width: 100%;
 }
 
@@ -40,6 +39,7 @@ table, tr
 	background-color: #353535;
 	border-collapse: collapse;
 	font-size: small;
+	box-shadow: 0px 0.8px 0.7em #777;
 }
 th
 {
@@ -48,7 +48,7 @@ th
 	font-style: normal;
 	font-weight: normal;
 	text-align: left;
-	width:20%;
+	width:21%;
 	padding: .4em .7em .4em .7em;
 }
 td
@@ -56,12 +56,25 @@ td
 	color: #FFFFFF;
 	padding: .4em .7em .4em .7em;
 }
+td#comment
+{
+	width:50px;
+}
 
-input[type=submit] {
+input[type=submit].choice {
 	background-color: #F3F3F3;
-	border:1px #CCC solid;
+	border:0px;
 	box-shadow: 1px 1px 0 #777;
 	border-radius: 3px;
+	width:100px;
+	height: 100px;
+	margin-left: 20px;
+	font-size: 1.2em;
+	font-weight: bold;
+	text-transform: uppercase;
+	color:#FFF;
+	text-shadow: 1px 1px #000;
+	background: -webkit-linear-gradient(top, #8FC2E9 30%, #66A3D2  100%);
 }
 
 input[type=submit].new {
@@ -83,7 +96,7 @@ input[type=submit].new {
 	background-color: #FFF;
 	color: #000;
 	margin: 2em auto;
-	box-shadow: 0px 5px 0.7em #777;
+	box-shadow: 0px 0px 0.7em #777;
 }
 div.logo a, div.logo a:hover, div.logo a:visited, div.logo a:active {
 	color:#FFF;
@@ -94,9 +107,42 @@ div.logo a, div.logo a:hover, div.logo a:visited, div.logo a:active {
 	background-color: #222;
 	color: #FFF;
 }
+.result {
+	text-align: center;
+	text-transform: uppercase;
+}
 .content {
 	padding: 0em 2em 2em 2em;
 }
+.box {
+	background-color: #353535;
+	padding: 20px 0px 10px 0px;
+	box-shadow: 0px 0.8px 0.7em #777;
+}
 .center {
 	margin: 0 auto;
+}
+
+.bar {
+	width: 100%;
+	height: 15px;
+	background: #CCC;
+}
+.p {
+	background: #669900;
+	padding: 0;
+	margin: 0;
+	float: left;
+}
+.c {
+	background: #cc3333;
+	padding: 0;
+	margin: 0;
+	float: left;
+}
+.t {
+	background: #FFAA00;
+	padding: 0;
+	margin: 0;
+	float: left;
 }
