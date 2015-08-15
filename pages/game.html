@@ -1,0 +1,55 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Rock Paper Scissors Lizard Spock - Written in Golang</title>
+	<link rel="stylesheet" type="text/css" href="/rpsls/css/style.css" />
+	<script type="text/javascript" src="/rpsls/js/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="/rpsls/js/game.js"></script>
+</head>
+<body>
+<div class="container">
+	<div class="logo">
+		<h1><a href="http://go.nikz.se/rpsls/">Rock Paper Scissors Lizard Spock - Written in Golang</a></h1>
+	</div>
+	<div class="content">
+		<h2>Make your choice</h2>
+		<div class="box">
+			<div><input type="button" class="choice" name="choice" value="rock" onclick="sendChoice('rock');">
+			<input type="button" class="choice" name="choice" value="paper" onclick="sendChoice('paper');">
+			<input type="button" class="choice" name="choice" value="scissors" onclick="sendChoice('scissors');">
+			<input type="button" class="choice" name="choice" value="lizard" onclick="sendChoice('lizard');">
+			<input type="button" class="choice" name="choice" value="spock" onclick="sendChoice('spock');"></div>
+		</div>
+		<div class="result">
+			<h2><span id="result">{{.LastGame}}</span></h2>
+		</div>
+		<h2>Game Stats</h2>
+		<table class="table">
+					<tr>
+						<th>Game ID</th>
+						<td id="comment">{{.GameId}}</td>
+					</tr>
+					<tr>
+						<th>Games Played</th>
+						<td class="comment"><span id="games">{{.Games}}</span></td>
+					</tr>
+					<tr>
+						<th>Player Score</th>
+						<td class="comment"><span id="winsPlayer">{{.PlayerWins}}</span></td>
+						<td class="stat"><div class="bar">
+						<div class="p" style="display: inline-block; width: {{.PlayerPercent}}%;"><span id="scorePlayer">{{.PlayerPercent}}</span></div>
+						<div class="c" style="display: inline-block; width: {{.ComputerPercent}}%;"><span id="scoreComputer">{{.ComputerPercent}}</span></div>
+						<div class="t" style="display: inline-block; width: {{.TiesPercent}}%;"><span id="scoreTies">{{.TiesPercent}}</span></div>
+						</div></td>
+					</tr>
+					<tr>
+						<th>Computer Score</th>
+						<td class="comment"><span id="winsComputer">{{.ComputerWins}}</span></td>
+					</tr>
+					<tr>
+						<th>Ties</th>
+						<td class="comment"><span id="winsTies">{{.Ties}}</span></td>
+					</tr>
+				</table>
+	</div>
+</div>

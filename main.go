@@ -5,111 +5,51 @@ import (
 	"html/template"
 	"os"
 	"io/ioutil"
+	"encoding/json"
 	"log"
 	"net"
 	"net/http"
 	"regexp"
 	"fmt"
-	"math"
 	"math/rand"
 	"time"
-	"encoding/json"
+	"github.com/rock/logic/handler"
 )
 
 var (
 	addr = flag.Bool("addr", false, "find open address and print to final-port.txt")
-	templates = template.Must(template.ParseFiles("tmpl/index.html", "tmpl/game.html", "tmpl/result.html"))
+	templates = template.Must(template.ParseFiles("pages/index.html", "pages/game.html", "pages/result.html"))
 	validPath = regexp.MustCompile("^/(rpsls/game|rpsls/new|rpsls/result|rpsls/history)/([a-zA-Z0-9]+)$")
-
-	choice = [5]string {"rock", "paper", "scissors", "lizard", "spock"}
-	moves = [10]Move {
-		{Player1: "rock", Player2: "scissors", Flavor: "crushes"},
-		{Player1: "rock", Player2: "lizard", Flavor: "crushes"},
-		{Player1: "paper", Player2: "rock", Flavor: "covers"},
-		{Player1: "paper", Player2: "spock", Flavor: "disproves"},
-		{Player1: "scissors", Player2: "paper", Flavor: "cuts"},
-		{Player1: "scissors", Player2: "lizard", Flavor: "decapitates"},
-		{Player1: "lizard", Player2: "spock", Flavor: "poisons"},
-		{Player1: "lizard", Player2: "paper", Flavor: "eats"},
-		{Player1: "spock", Player2: "rock", Flavor: "vaporizes"},
-		{Player1: "spock", Player2: "scissors", Flavor: "smashes"},
-	}
 )
 
-type Move struct {
-	Player1 string
-	Player2 string
-	Flavor string
-}
-
-type Game struct {
+type Result struct {
 	GameId string
-	Player []string
 	LastGame string
-	Computer []string
-	Flavor []string
 	PlayerWins int
-	PlayerPercent float64
 	ComputerWins int
-	ComputerPercent float64
 	Ties int
-	TiesPercent float64
 	Games int
+	PlayerPercent float64
+	ComputerPercent float64
+	TiesPercent float64
 }
 
-func (g *Game) save() error {
+func save(g *game.Game) error {
 	filename := g.GameId + ".txt"
 	b, _ := json.Marshal(g)
+
 	return ioutil.WriteFile("data/" + g.GameId + "/" + filename, b, 0600)
 }
 
-func loadGame(gameId string) (*Game, error) {
+func loadGame(gameId string) (*game.Game, error) {
  	filename := gameId + ".txt"
  	body, err := ioutil.ReadFile("data/" + gameId + "/" + filename)
  	if err != nil {
  		return nil, err
  	}
- 	g := new(Game)
+ 	g := new(game.Game)
  	json.Unmarshal(body, g)
  	return g, nil
-}
-
-func (g *Game) runRound(p string, c string) {
-	g.Player = append(g.Player, p)
-	g.Computer = append(g.Computer, c)
-
-	for i := 0; i < 10; i++ {
-		if p == c {
-			g.Ties++
-			g.Flavor = append(g.Flavor, "Ties")
-			g.LastGame = p + " Ties " + c
-			break
-		}
-		switch {
-			case moves[i].Player1 == p && moves[i].Player2 == c:
-				g.PlayerWins++
-				g.Flavor = append(g.Flavor, moves[i].Flavor)
-				g.LastGame = moves[i].Player1 + " " + moves[i].Flavor + " " + moves[i].Player2 + ", Player Wins"
-				break
-			case moves[i].Player1 == c && moves[i].Player2 == p:
-				g.ComputerWins++
-				g.Flavor = append(g.Flavor, moves[i].Flavor)
-				g.LastGame = moves[i].Player1 + " " + moves[i].Flavor + " " + moves[i].Player2 + ", Computer Wins"
-				break
-		}
-	}
-	g.Games++
-	g.PlayerPercent = calcPercent(g.PlayerWins, g.Games)
-	g.ComputerPercent = calcPercent(g.ComputerWins, g.Games)
-	g.TiesPercent = calcPercent(g.Ties, g.Games)
-	//calcPercent(g)
-}
-
-func calcPercent(x int, y int) float64 {
-	if(x == 0 && y == 0) {
-		return 0
-	}
-	return math.Floor(float64(x) / float64(y) * 100)
 }
 
 func generateGameId(l int) string {
@@ -120,11 +60,7 @@ func generateGameId(l int) string {
 	return string(bytes)
 }
 
-func computerChoice() string {
-	return choice[rand.Intn(100) % 5]
-}
-
-func renderTemplate(w http.ResponseWriter, tmpl string, g *Game) {
+func renderTemplate(w http.ResponseWriter, tmpl string, g *game.Game) {
 	err := templates.ExecuteTemplate(w, tmpl+".html", g)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -132,41 +68,59 @@ func renderTemplate(w http.ResponseWriter, tmpl string, g *Game) {
 }
 
 func frontPageHandler(w http.ResponseWriter, r *http.Request) {
-	g := Game { GameId: generateGameId(10)}
-	renderTemplate(w, "index", &g)
+	renderTemplate(w, "index", nil)
 }
 
 func gameHandler(w http.ResponseWriter, r *http.Request, gameId string) {
 	g, err := loadGame(gameId)
 	if err != nil {
-		http.Redirect(w, r, "/rpsls/new/"+generateGameId(10), http.StatusFound)
+		http.Redirect(w, r, "/rpsls/new/", http.StatusFound)
 		return
 	}
 	renderTemplate(w, "game", g)
 }
 
 func newHandler(w http.ResponseWriter, r *http.Request, gameId string) {
-	g := Game { GameId: gameId, Player: nil, Computer: nil, PlayerWins: 0, ComputerWins: 0, Ties: 0, Games: 0}
+	g := game.Game { GameId: gameId, Player: nil, Computer: nil, PlayerWins: 0, ComputerWins: 0, Ties: 0, Games: 0}
 	os.Mkdir("data/" + gameId, 0600)
-	err := g.save()
+	err := save(&g)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/rpsls/game/"+gameId, http.StatusFound)
+	http.Redirect(w, r, "/rpsls/game/" + gameId, http.StatusFound)
+}
+
+func newHandler2(w http.ResponseWriter, r *http.Request) {
+	g := game.Game { GameId: generateGameId(10), Player: nil, Computer: nil, PlayerWins: 0, ComputerWins: 0, Ties: 0, Games: 0}
+	os.Mkdir("data/" + g.GameId, 0600)
+	err := save(&g)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	b, _ := json.Marshal(g)
+	fmt.Fprint(w, string(b))
 }
 
 func resultHandler(w http.ResponseWriter, r *http.Request, gameId string) {
-	p := r.FormValue("choice")
-	c := computerChoice()
 	g, err := loadGame(gameId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	g.runRound(p, c)
-	g.save()
-	http.Redirect(w, r, "/rpsls/game/"+gameId, http.StatusFound)
+	p := r.FormValue("choice")
+	g.RunRound(p)
+	save(g)
+
+	res := Result { GameId : g.GameId, LastGame : g.LastGame, PlayerWins : g.PlayerWins,
+		ComputerWins : g.ComputerWins, Ties : g.Ties, Games : g.Games, TiesPercent : g.TiesPercent,
+		PlayerPercent : g.PlayerPercent, ComputerPercent : g.ComputerPercent,
+	}
+
+	b, _ := json.Marshal(res)
+	fmt.Fprint(w, string(b))
+	//http.Redirect(w, r, "/rpsls/game/" + gameId, http.StatusFound)
 }
 
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
@@ -184,10 +138,11 @@ func main() {
 	flag.Parse()
 	rand.Seed(time.Now().UTC().UnixNano())
 	http.HandleFunc("/rpsls/", frontPageHandler)
-	http.HandleFunc("/rpsls/new/", makeHandler(newHandler))
+	http.HandleFunc("/rpsls/new/", newHandler2)
 	http.HandleFunc("/rpsls/game/", makeHandler(gameHandler))
 	http.HandleFunc("/rpsls/result/", makeHandler(resultHandler))
-	http.Handle("/rpsls/css/", http.StripPrefix("/rpsls/css/", http.FileServer(http.Dir("tmpl"))))
+	http.Handle("/rpsls/css/", http.StripPrefix("/rpsls/css/", http.FileServer(http.Dir("pages"))))
+	http.Handle("/rpsls/js/", http.StripPrefix("/rpsls/js/", http.FileServer(http.Dir("pages/js"))))
 
 //	if *addr {
 		l, err := net.Listen("tcp", "127.0.0.1:9001")
